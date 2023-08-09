@@ -1,16 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './FamousSection.css';
+import axios from 'axios'
 
-function FamousSection() {
-  let [famousPersonName, setPersonName] = useState('');
-  let [famousPersonRole, setPersonRole] = useState('');
-  let [famousPeopleArray, setPeopleArray] = useState([]);
 
+ function FamousSection() {
+  const [famousPersonName, setPersonName] = useState('');
+  const [famousPersonRole, setPersonRole] = useState('');
+  const [famousPeopleArray, setPeopleArray] = useState([]);
+ 
   // TODO: on load, call the fetchPeople() function
 
   const fetchPeople = () => {
+    console.log('inside of fetchPeople()')
+    axios.get('/')
+    .then((response) => {
+      console.log(response.data)
+
+      setPeopleArray(response.data)
+    }).catch((error) => {
+     console.log('Error GET /creature', error)
+    })
+ }
+
     // TODO: fetch the list of people from the server
-  }
+  
+  useEffect(() => {
+    fetchPeople()
+  }, [])
 
   const addPerson = (evt) => {
     evt.preventDefault();
@@ -20,8 +36,15 @@ function FamousSection() {
 
     // HINT: the server is expecting a person object 
     //       with a `name` and a `role` property
-  
+    axios.post('/', {name: famousPersonName.name, role: famousPersonRole.role}
+    ).then((response) => {
+      console.log(response);
+      fetchPeople()
+    }).catch((error) => {
+      console.log('Error POST /')
+    })
   }
+  
 
     return (
       <section className="new-person-section">
@@ -36,10 +59,14 @@ function FamousSection() {
           {famousPersonName} is famous for "{famousPersonRole}".
         </p>
         <ul>
-          {/* TODO: Render the list of famous people */}
+          {famousPeopleArray.map(setPeopleArray => (
+          <li key={setPeopleArray.id}>
+            {setPeopleArray.name} is from {setPeopleArray.role}
+            </li>
+             ))}
         </ul>
       </section>
+     
     );
-}
-
+          }
 export default FamousSection;
